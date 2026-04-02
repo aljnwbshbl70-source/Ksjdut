@@ -1,3 +1,16 @@
+const express = require('express');
+const app = express();
+
+// كود لضمان الاستيقاظ الدائم
+app.get('/', (req, res) => {
+    res.status(200).send('Yami Bot is Awake and Running! 🚀');
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is active on port ${port}`);
+});
+
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const app = express();
