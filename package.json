@@ -1,27 +1,13 @@
-const TelegramBot = require('node-telegram-bot-api');
-const axios = require('axios');
-const express = require('express');
-
-const app = express();
-app.listen(process.env.PORT || 3000);
-
-const token = '8797569562:AAHpKFwIWDBjudIwwbNZBjapckJnIYGewbY';
-const bot = new TelegramBot(token, { polling: true });
-
-bot.on('message', async (msg) => {
-    const text = msg.text;
-    if (text && text.startsWith('http')) {
-        bot.sendMessage(msg.chat.id, "⏳ جاري جلب الفيديو من سيرفرات يامي... ثواني");
-        try {
-            const res = await axios.get(`https://api.vreden.my.id/api/downloadall?url=${encodeURIComponent(text)}`);
-            const url = res.data.result.url || res.data.result.data.url;
-            if (url) {
-                bot.sendVideo(msg.chat.id, url, { caption: "✅ تم التحميل - @ALALIPLUS" });
-            } else {
-                bot.sendMessage(msg.chat.id, "❌ لم أجد فيديو، جرب رابطاً آخر.");
-            }
-        } catch (e) {
-            bot.sendMessage(msg.chat.id, "⚠️ السيرفر مضغوط حالياً، حاول مرة أخرى.");
-        }
-    }
-});
+{
+  "name": "yami-downloader-v4",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.64.0",
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  }
+}
