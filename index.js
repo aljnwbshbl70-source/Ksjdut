@@ -1,28 +1,44 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
+const ytdl = require('@distube/ytdl-core');
+const { tiktok } = require('tiktok-downloader-v2');
+const instagramGetUrl = require("instagram-url-direct");
+
 const app = express();
 app.listen(process.env.PORT || 3000);
 
 const token = '8797569562:AAHpKFwIWDBjudIwwbNZBjapckJnIYGewbY';
 const bot = new TelegramBot(token, { polling: true });
 
-bot.onText(/\/start/, (msg) => {
-    const opts = {
-        reply_markup: {
-            inline_keyboard: [
-                [{ text: '🎬 تحميل من تيك توك (سريع)', url: 'https://t.me/SaveAsBot' }],
-                [{ text: '📺 تحميل من يوتيوب (HD)', url: 'https://t.me/Downloadstorybot' }],
-                [{ text: '📸 تحميل إنستقرام وبحث', url: 'https://t.me/Biobot' }],
-                [{ text: '📢 قناة التحديثات', url: 'https://t.me/ALALIPLUS' }],
-                [{ text: '👨‍💻 المطور يامي الرسمي', url: 'https://t.me/yami_official' }]
-            ]
-        }
-    };
-    bot.sendMessage(msg.chat.id, "🚀 **مرحباً بك في بوابة يامي للتحميل V3**\n\nلقد قمنا بربط أفضل سيرفرات التحميل العالمية (بدون إعلانات) لخدمتك.\n\nإختر المنصة التي تريد التحميل منها أدناه:", { parse_mode: 'Markdown', ...opts });
-});
+bot.on('message', async (msg) => {
+    const text = msg.text;
+    const chatId = msg.chat.id;
+    if (!text || !text.startsWith('http')) return;
 
-bot.on('message', (msg) => {
-    if (msg.text && msg.text.startsWith('http')) {
-        bot.sendMessage(msg.chat.id, "💡 **عزيزي المستخدم:** لضمان أفضل جودة وسرعة، يرجى الضغط على الزر المناسب للمنصة من القائمة أعلاه (أرسل /start لتظهر لك).");
+    bot.sendMessage(chatId, "⏳ جاري المعالجة العميقة بواسطة سيرفر يامي V4... 🚀");
+
+    try {
+        // 1. معالجة تيك توك (Tiktok)
+        if (text.includes('tiktok.com')) {
+            const res = await tiktok(text);
+            return bot.sendVideo(chatId, res.video.no_watermark, { caption: "✅ تيك توك بدون حقوق - يامي" });
+        }
+
+        // 2. معالجة يوتيوب (YouTube)
+        if (text.includes('youtube.com') || text.includes('youtu.be')) {
+            const info = await ytdl.getInfo(text);
+            const format = ytdl.chooseFormat(info.formats, { quality: 'highestvideo' });
+            return bot.sendVideo(chatId, format.url, { caption: "✅ يوتيوب HD - يامي" });
+        }
+
+        // 3. معالجة إنستقرام (Instagram)
+        if (text.includes('instagram.com')) {
+            const res = await instagramGetUrl(text);
+            return bot.sendVideo(chatId, res.url_list[0], { caption: "✅ إنستقرام - يامي" });
+        }
+
+        bot.sendMessage(chatId, "⚠️ المنصة غير مدعومة حالياً، أرسل رابط تيك توك أو يوتيوب أو إنستا.");
+    } catch (e) {
+        bot.sendMessage(chatId, "❌ السيرفر مضغوط أو الرابط خاص، حاول لاحقاً.");
     }
 });
