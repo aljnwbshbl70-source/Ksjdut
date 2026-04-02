@@ -1,15 +1,14 @@
 {
-  "name": "yami-bot-v2",
+  "name": "yami-downloader-v1",
   "version": "1.0.0",
-  "description": "Second Project by Yami",
+  "description": "Downloader Bot by Yami",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.6.0",
     "node-telegram-bot-api": "^0.64.0",
-    "express": "^4.18.2",
-    "pino": "^8.19.0"
+    "axios": "^1.6.0",
+    "express": "^4.18.2"
   }
 }
