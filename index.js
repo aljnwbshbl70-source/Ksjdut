@@ -1,28 +1,37 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const app = express();
-app.listen(process.env.PORT || 3000);
 
+// --- إعدادات السيرفر لضمان العمل 24 ساعة في Render ---
+const port = process.env.PORT || 3000;
+app.get('/', (req, res) => res.send('Yami Bot is Online! 🚀'));
+app.listen(port, () => console.log(`Server running on port ${port}`));
+
+// --- توكن البوت الخاص بك ---
 const token = '8797569562:AAHpKFwIWDBjudIwwbNZBjapckJnIYGewbY';
 const bot = new TelegramBot(token, { polling: true });
 
-// --- إعدادات المطور والقنوات ---
-const channelUsername = '@jes45kabot'; // قناة التيليجرام للاشتراك الإجباري
-const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; // قناة الواتساب
-const devWhatsapp = 'https://wa.me/966574360046'; // رابط الواتس المباشر ليامي
+// --- إعدادات القنوات والمطور (يامي) ---
+const channelUsername = '@jes45kabot'; // يوزر قناة التيليجرام للاشتراك الإجباري
+const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; // رابط قناة الواتساب
+const devWhatsapp = 'https://wa.me/966574360046'; // رابط الواتساب المباشر للمطور يامي
 
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
     const text = msg.text;
 
+    if (!text) return;
+
     try {
-        // 1. فحص الاشتراك الإجباري في قناة التيليجرام
+        // --- 1. فحص الاشتراك الإجباري ---
         const member = await bot.getChatMember(channelUsername, userId);
         const isMember = ['member', 'administrator', 'creator'].includes(member.status);
 
         if (!isMember) {
-            return bot.sendMessage(chatId, `⚠️ **توقف قليلاً! يجب عليك الانضمام لعائلة يامي أولاً.**\n\nلاستخدام خدمات البوت والتحميل السريع، يرجى الاشتراك في قناة التحديثات الرسمية ثم أرسل /start\n\n📢 القناة: ${channelUsername}`, {
+            const joinMsg = `⚠️ **توقف قليلاً! يجب عليك الانضمام لعائلة يامي أولاً.**\n\nلاستخدام خدمات البوت والتحميل السريع، يرجى الاشتراك في قناة التحديثات الرسمية ثم أرسل /start\n\n📢 القناة: ${channelUsername}`;
+            return bot.sendMessage(chatId, joinMsg, {
+                parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: '📢 إضغط هنا للاشتراك في القناة', url: `https://t.me/${channelUsername.replace('@', '')}` }]
@@ -31,9 +40,9 @@ bot.on('message', async (msg) => {
             });
         }
 
-        // 2. إذا كان المستخدم مشتركاً وضغط Start أو أرسل رسالة
+        // --- 2. الاستجابة للأوامر والروابط ---
         if (text === '/start') {
-            const welcomeMsg = `✨ **مرحباً بك في عالم يامي للتحميل الذكي V3** ✨\n\n🚀 **أسرع بوت تحميل في الشرق الأوسط بين يديك الآن!**\n\nلقد قمنا بدمج أقوى السيرفرات العالمية لنوفر لك تجربة فريدة، بدون إعلانات مزعجة وبجودة HD.\n\n👇 **اختر المنصة التي تريد التحميل منها:**`;
+            const welcomeMsg = `✨ **مرحباً بك في عالم يامي للتحميل الذكي V3** ✨\n\n🚀 **أسرع بوت تحميل متكامل بين يديك الآن!**\n\nلقد قمنا بدمج أقوى السيرفرات العالمية لنوفر لك تجربة فريدة، بدون إعلانات وبجودة عالية.\n\n👇 **اختر المنصة التي تريد التحميل منها:**`;
             
             const opts = {
                 parse_mode: 'Markdown',
@@ -50,13 +59,12 @@ bot.on('message', async (msg) => {
             return bot.sendMessage(chatId, welcomeMsg, opts);
         }
 
-        // 3. تنبيه عند إرسال روابط مباشرة
-        if (text && text.startsWith('http')) {
-            bot.sendMessage(chatId, "💡 **عزيزي المستخدم:** لضمان استخراج الفيديو بأفضل جودة، يرجى استخدام أزرار المنصات أعلاه.\n\n*(أرسل /start لإظهار القائمة)*");
+        if (text.startsWith('http')) {
+            bot.sendMessage(chatId, "💡 **عزيزي المستخدم:** لضمان استخراج الفيديو بأفضل جودة وسرعة، يرجى استخدام أزرار المنصات أعلاه.\n\n*(أرسل /start لإظهار القائمة)*");
         }
 
     } catch (e) {
-        // إذا لم يكن البوت مشرفاً، سيعمل كدليل عادي مؤقتاً
-        bot.sendMessage(chatId, "⚠️ **تنبيه للمطور:** يرجى رفع البوت مشرفاً في القناة ليفعل نظام الاشتراك الإجباري.");
+        // في حال كان البوت ليس مشرفاً في القناة
+        bot.sendMessage(chatId, "⚠️ **تنبيه:** يرجى التأكد من رفع البوت 'مشرفاً' في قناة التحديثات ليعمل نظام الاشتراك الإجباري.");
     }
 });
