@@ -5,14 +5,11 @@ const app = express();
 
 // --- نظام البقاء حياً ---
 const port = process.env.PORT || 3000;
-app.get('/', (req, res) => res.status(200).send('OK'));
+app.get('/', (req, res) => res.status(200).send('Jessica Gemini is Active!'));
 app.listen(port, '0.0.0.0');
 
 // --- الإعدادات ---
 const token = '8797569562:AAHpKFwIWDBjudIwwbNZBjapckJnIYGewbY'; 
-// تم تحديث المفتاح هنا ليعمل الـ AI فوراً
-const openAiApiKey = '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';
-
 const bot = new TelegramBot(token, { polling: true });
 const userState = {}; 
 
@@ -20,22 +17,21 @@ const channelUsername = '@jes45kabot';
 const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; 
 const devWhatsapp = 'https://wa.me/966574360046'; 
 
+// مصفوفة الزخارف
 const getZakhrafa = (t) => [
     `ꪗ̶${t}̶ꪖ̶ꪑ̶ꪱ̶`, `ყ̷${t}̷α̷ɱ̷ι̷`, `Ɏ͢${t}͢₳͢₥͢ł͢`, `𐌖𐌀${t}𐌉`, `𓎛𓄿${t}𓇋`, `ꌩꍏ${t}ꀤ`, `Ⴤმო${t}ɿ`, `ყค${t}ɱɿ`,
     `${t} ΛMI`, `${t} ΔMI`, `${t} ᗩMI`, `ⲨⲀ${t}Ⲓ`,
-    `${t}҉a҉m҉i҉💀⚡`, `${t}̸a̸m̸i̸☠️🖤`, `${t}͢a͢m͢i͢👁️‍🗨️💥`, `${t}̴a̴m̴i̴🧿⚔️`, `${t}̷͜a̷͜m̷͜i̷👻💣`, `${t}͜͞a͜͞m͜͞i͜͞🕷️🔥`, `『${t}』🔥`, `𓆩${t}𓆪`, `𖤐 ${t}`
+    `${t}҉a҉m҉i҉💀⚡`, `${t}̸a̸m̸i̸☠️🖤`, `${t}͢a͢m͢i͢👁️‍🗨️💥`, `『${t}』🔥`, `𓆩${t}𓆪`, `𖤐 ${t}`
 ];
 
-async function askAi(text) {
+// --- دالة الدردشة المرتبطة بذكائي (Gemini Free API) ---
+async function askGemini(text) {
     try {
-        const res = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: 'gpt-3.5-turbo',
-            messages: [{ role: 'user', content: text }]
-        }, { headers: { 'Authorization': `Bearer ${openAiApiKey}`, 'Content-Type': 'application/json' } });
-        return res.data.choices[0].message.content;
-    } catch (e) { 
-        console.log("AI Error Details:", e.response ? e.response.data : e.message);
-        return "⚠️ عذراً، مساعد جيسيكا مشغول حالياً. (تأكد من رصيد مفتاح الـ AI في OpenAI)"; 
+        // نستخدم هنا API وسيط مجاني للوصول لذكاء Gemini
+        const response = await axios.get(`https://api.popcat.xyz/chatbot?msg=${encodeURIComponent(text)}&name=Jessica&user=${Date.now()}`);
+        return response.data.response;
+    } catch (e) {
+        return "⚠️ أعتذر منك، واجهت مشكلة في الاتصال بذكائي الداخلي. حاول مرة أخرى.";
     }
 }
 
@@ -44,7 +40,7 @@ bot.on('message', async (msg) => {
     const text = msg.text;
     if (!text) return;
 
-    // فحص الاشتراك
+    // فحص الاشتراك الإجباري
     try {
         const member = await bot.getChatMember(channelUsername, msg.from.id);
         if (!['member', 'administrator', 'creator'].includes(member.status)) {
@@ -56,12 +52,10 @@ bot.on('message', async (msg) => {
 
     if (text === '/start') {
         userState[chatId] = null;
-        const welcomeMsg = `✨ **عالم جيسيكا AI المطور** ✨\n\nأهلاً بك يا ${msg.from.first_name}، اختر خدمتك من الأزرار الشفافة:`;
-        
-        return bot.sendMessage(chatId, welcomeMsg, {
+        return bot.sendMessage(chatId, `✨ **مرحباً بك في عالم جيسيكا المطور** ✨\n\nلقد تم ربطي بذكاء Gemini المتطور! 🤖\nاختر خدمتك:`, {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: '🤖 جيسيكا Ai (دردشة)', callback_data: 'mode_chat' }, { text: '🎨 قسم الزخرفة', callback_data: 'mode_zak' }],
+                    [{ text: '🤖 دردشة مع جيسيكا (Gemini)', callback_data: 'mode_chat' }, { text: '🎨 قسم الزخرفة', callback_data: 'mode_zak' }],
                     [{ text: '📺 يوتيوب', url: 'https://t.me/Downloadstorybot' }, { text: '🎬 تيك توك', url: 'https://t.me/SaveAsBot' }],
                     [{ text: '📸 إنستغرام', url: 'https://t.me/Biobot' }],
                     [{ text: '🔄 تحويل صيغ', callback_data: 'convert_info' }],
@@ -74,7 +68,7 @@ bot.on('message', async (msg) => {
     if (!text.startsWith('/')) {
         if (userState[chatId] === 'CHAT') {
             bot.sendChatAction(chatId, 'typing');
-            const reply = await askAi(text);
+            const reply = await askGemini(text);
             return bot.sendMessage(chatId, reply);
         }
 
@@ -95,32 +89,27 @@ bot.on('message', async (msg) => {
 
 bot.on('callback_query', (q) => {
     const chatId = q.message.chat.id;
-    
     if (q.data === 'mode_chat') {
         userState[chatId] = 'CHAT';
-        bot.sendMessage(chatId, "اهلا أنا مساعد جـيـسـيـكـا تفضل مااذا تريد مساعده مني 🫶💗", {
-            reply_markup: { inline_keyboard: [[{ text: '🏠 إنهاء الدردشة والعودة', callback_data: 'back_main' }]] }
+        bot.sendMessage(chatId, "أهلاً بك! أنا الآن أعمل بذكاء Gemini المتطور.. كيف يمكنني مساعدتك؟ 🫶💗", {
+            reply_markup: { inline_keyboard: [[{ text: '🏠 إنهاء الدردشة', callback_data: 'back_main' }]] }
         });
     }
-
     if (q.data === 'mode_zak') {
         userState[chatId] = 'ZAK';
-        bot.sendMessage(chatId, "🎨 **أنت الآن في قسم الزخرفة.** أرسل الاسم الآن لزخرفته.", {
+        bot.sendMessage(chatId, "🎨 أرسل الاسم الآن لزخرفته:", {
             reply_markup: { inline_keyboard: [[{ text: '🏠 عودة', callback_data: 'back_main' }]] }
         });
     }
-
     if (q.data === 'back_main') {
         userState[chatId] = null;
-        bot.sendMessage(chatId, "✨ تم العودة للقائمة الرئيسية. أرسل /start للإظهار.");
+        bot.sendMessage(chatId, "✨ تم العودة للقائمة. أرسل /start للإظهار.");
     }
-
     if (q.data.startsWith('sh_')) {
         const parts = q.data.split('_');
         const list = getZakhrafa(parts[2]);
         bot.sendMessage(chatId, `\`${list[parts[1]]}\``, { parse_mode: 'Markdown' });
     }
-
     bot.answerCallbackQuery(q.id);
 });
-                           
+                        
