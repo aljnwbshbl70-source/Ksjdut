@@ -1,32 +1,27 @@
-const TelegramBot = require('node-telegram-bot-api');
+دconst TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const app = express();
 
-// --- نظام البقاء حياً 24 ساعة (لخدمة Cron-job) ---
+// --- نظام البقاء حياً 24 ساعة (Render + Cron-job) ---
 const port = process.env.PORT || 3000;
 app.get('/', (req, res) => res.status(200).send('OK'));
-app.listen(port, () => console.log(`Server active on ${port}`));
+app.listen(port, () => console.log(`Server running...`));
 
-// --- إعدادات البوت والقنوات ---
 const token = '8797569562:AAHpKFwIWDBjudIwwbNZBjapckJnIYGewbY';
 const bot = new TelegramBot(token, { polling: true });
 
-const channelUsername = '@jes45kabot'; // قناة التيليجرام الأساسية
-const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; // قناة الواتساب
-const devWhatsapp = 'https://wa.me/966574360046'; // واتساب المطور يامي
+const channelUsername = '@jes45kabot'; 
+const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; 
+const devWhatsapp = 'https://wa.me/966574360046'; 
 
-// --- ميزة الزخرفة الاحترافية ---
-const decorateText = (text) => {
-    return [
-        `𝗝̸͢${text}̸𝝰⃪ִ֟፝🈞̥݄֯⃧⃞🕸️`,  // النمط المطلوب 1
-        `ɑׅძ${text}ׅꪱ๋𐓣Swan🦢`, // النمط المطلوب 2
-        `『${text}』🔥`,
-        `⚡️ 𝖦${text}𝖱 ⚡️`,
-        `✨ 𝒀𝑨𝑴𝑰 - ${text} ✨`,
-        `⸽⸽ ${text} ⸽⸽ 💎`,
-        `【${text}】👑`
-    ];
-};
+// --- مصفوفة الزخارف العملاقة (الأشكال المطلوبة بدقة) ---
+const getZakhrafa = (t) => [
+    `ꪗ̶${t}̶`, `ყ̷${t}̷`, `Ɏ͢${t}͢`, `𐌖𐌀${t}𐌉`, `𓎛𓄿${t}𓇋`, `ꌩꍏ${t}ꀤ`, `Ⴤმო${t}`, `ყค${t}ค`, `ƴค${t}ค`,
+    `${t} ΛMI`, `${t} ΔMI`, `${t} ᗩMI`, `ⲨⲀ${t}Ⲓ`,
+    `${t}҉💀⚡`, `${t}̸☠️🖤`, `${t}͢👁️‍🗨️💥`, `${t}̴🧿⚔️`, `${t}̷͜👻💣`, `${t}͜͞🕷️🔥`, `${t}⃟💀🕸️`, `${t}͓̽⚡🖤`, `${t}̾͟👁️`,
+    `${t}҉̷͜`, `${t}̸̛͢`, `${t}̡͜͞`, `${t}̴̖͠`, `${t}⃢̷͢`, `${t}͓̽̽͜`, `${t}̺̺͆`, `${t}̟̾͟`, `${t}̷͛͜`,
+    `𝗝̸͢${t}̸𝝰⃪ִ֟፝🈞̥݄֯⃧⃞🕸️`, `ɑׅძ${t}ׅꪱ๋𐓣Swan🦢`, `『${t}』🔥`, `𓆩${t}𓆪`, `᭄${t}`, `${t}𖤍`, `${t}༒`, `𖤐 ${t}`, `${t}𓂀`
+];
 
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
@@ -36,51 +31,60 @@ bot.on('message', async (msg) => {
     if (!text) return;
 
     try {
-        // 🛡️ فحص الاشتراك الإجباري (صارم جداً قبل أي خطوة)
+        // فحص الاشتراك الإجباري (لا يتغير)
         const member = await bot.getChatMember(channelUsername, userId);
         const isMember = ['member', 'administrator', 'creator'].includes(member.status);
 
         if (!isMember) {
-            const joinMsg = `⚠️ **عذراً عزيزي! يجب عليك الانضمام لقناتنا أولاً لاستخدام البوت.**\n\nاشترك هنا: ${channelUsername}\n\nبعد الاشتراك، أرسل /start لتفعيل الخدمات.`;
-            return bot.sendMessage(chatId, joinMsg, {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: [[{ text: '📢 اضغط هنا للاشتراك في القناة', url: `https://t.me/${channelUsername.replace('@', '')}` }]]
-                }
+            return bot.sendMessage(chatId, `⚠️ **اشترك أولاً لتفتح الزخرفة:**\n📢 ${channelUsername}`, {
+                reply_markup: { inline_keyboard: [[{ text: '📢 إضغط هنا للاشتراك', url: `https://t.me/${channelUsername.replace('@', '')}` }]] }
             });
         }
 
-        // ✅ إذا كان مشتركاً:
         if (text === '/start') {
-            const welcomeText = `✨ **مرحباً بك في بوت يامي الشامل V4** ✨\n\n🚀 **الخدمات المتاحة:**\n1️⃣ تحميل سريع (تيك توك، يوتيوب، إنستا).\n2️⃣ قسم الزخرفة الاحترافي (فقط أرسل اسمك).\n\n👇 **اختر ما تريد من الأسفل:**`;
             const opts = {
                 parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: '🎬 تيك توك', url: 'https://t.me/SaveAsBot' }, { text: '📺 يوتيوب', url: 'https://t.me/Downloadstorybot' }],
-                        [{ text: '📸 إنستقرام', url: 'https://t.me/Biobot' }],
-                        [{ text: '💚 تابعنا على واتساب', url: whatsappChannel }],
-                        [{ text: '👨‍💻 مطور البوت (يامي)', url: devWhatsapp }]
+                        [{ text: '📸 إنستا', url: 'https://t.me/Biobot' }],
+                        [{ text: '👨‍💻 المطور يامي', url: devWhatsapp }]
                     ]
                 }
             };
-            return bot.sendMessage(chatId, welcomeText, opts);
+            return bot.sendMessage(chatId, `✨ **مرحباً بك في محرقة الزخارف V7** ✨\n\nأرسل اسمك الآن وشوف القوة!`, opts);
         }
 
-        // ✨ قسم الزخرفة (يعمل تلقائياً عند إرسال اسم)
+        // تحويل النص إلى أزرار زخرفة فخمة
         if (!text.startsWith('/') && !text.startsWith('http')) {
-            const list = decorateText(text);
-            let response = `✨ **زخارف يامي الاحترافية لاسمك ( ${text} ):**\n\n*(اضغط على الزخرفة للنسخ)*\n\n`;
-            list.forEach(item => response += `\`${item}\`\n\n`);
-            return bot.sendMessage(chatId, response, { parse_mode: 'Markdown' });
+            const list = getZakhrafa(text);
+            const buttons = [];
+            
+            for (let i = 0; i < list.length; i += 2) {
+                const row = [];
+                row.push({ text: `فخامة ${i+1} ⚡️`, callback_data: `zak_${i}_${text}` });
+                if (list[i+1]) row.push({ text: `فخامة ${i+2} ✨`, callback_data: `zak_${i+1}_${text}` });
+                buttons.push(row);
+            }
+
+            return bot.sendMessage(chatId, `🔥 **إليك زخارف اسم ( ${text} ) القوية:**\n\nاختر ستايلك المفضل:`, {
+                reply_markup: { inline_keyboard: buttons }
+            });
         }
 
-        // 💡 تنبيه التحميل
-        if (text.startsWith('http')) {
-            bot.sendMessage(chatId, "💡 **للتحميل بأفضل جودة:** استخدم أزرار المنصات في القائمة الرئيسية (أرسل /start).");
-        }
+    } catch (e) { console.log("Logic error"); }
+});
 
-    } catch (e) {
-        bot.sendMessage(chatId, "⚠️ **تنبيه للمطور:** يجب رفع البوت 'مشرفاً' في القناة ليفعل نظام الاشتراك.");
+// تنفيذ الزخرفة عند الضغط
+bot.on('callback_query', (query) => {
+    const data = query.data;
+    if (data.startsWith('zak_')) {
+        const parts = data.split('_');
+        const index = parseInt(parts[1]);
+        const name = parts[2];
+        const list = getZakhrafa(name);
+        
+        bot.sendMessage(query.message.chat.id, `✅ **تم استخراج الزخرفة بنجاح:**\n\n\`${list[index]}\`\n\n*(اضغط للنسخ)*`, { parse_mode: 'Markdown' });
+        bot.answerCallbackQuery(query.id);
     }
 });
