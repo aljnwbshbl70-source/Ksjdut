@@ -14,7 +14,7 @@ const channelUsername = '@jes45kabot';
 const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; 
 const devWhatsapp = 'https://wa.me/966574360046'; 
 
-// --- مصفوفة الزخارف القوية (تم تأمين الرموز) ---
+// --- مصفوفة الزخارف القوية ---
 const getZakhrafa = (t) => [
     `ꪗ̶${t}̶ꪖ̶ꪑ̶ꪱ̶`, `ყ̷${t}̷α̷ɱ̷ι̷`, `Ɏ͢${t}͢₳͢₥͢ł͢`, `𐌖𐌀${t}𐌉`, `𓎛𓄿${t}𓇋`, `ꌩꍏ${t}ꀤ`, `Ⴤმო${t}ɿ`, `ყค${t}ɱɿ`, `ƴค${t}ɱɿ`,
     `${t} ΛMI`, `${t} ΔMI`, `${t} ᗩMI`, `ⲨⲀ${t}Ⲓ`,
@@ -35,24 +35,34 @@ bot.on('message', async (msg) => {
         const isMember = ['member', 'administrator', 'creator'].includes(member.status);
 
         if (!isMember) {
-            return bot.sendMessage(chatId, `⚠️ **يجب الاشتراك في القناة أولاً:**\n📢 ${channelUsername}`, {
+            return bot.sendMessage(chatId, `⚠️ **عذراً! يجب عليك الاشتراك في القناة أولاً لاستخدام البوت:**\n\n📢 ${channelUsername}`, {
                 reply_markup: { inline_keyboard: [[{ text: '📢 إضغط هنا للاشتراك', url: `https://t.me/${channelUsername.replace('@', '')}` }]] }
             });
         }
 
-        if (text === '/start') {
-            return bot.sendMessage(chatId, `✨ **مرحباً بك في عالم جيسيكا  بوت تنزيل يجمع افضل أدوات تنزيل من مواقع التواصل الاجتماعي ويزخرف بافضل تشكيله زخارف في التاريخ V7** ✨\n\nأرسل اسمك الآن (بالعربي أو الإنجليزي) وشاهد أقوى الزخارف!`, {
+        if (text === '/start' || text === 'الرجوع للقائمة 🏠') {
+            const welcomeMsg = `✨ **مرحباً بك في بوت جيسيكا الشامل V8** ✨\n\n🚀 **أقوى بوت تحميل وزخرفة في التاريخ:**\n• تنزيل من جميع مواقع التواصل الاجتماعي.\n• زخرفة احترافية بأكثر من 40 ستايل عالمي.\n\n👇 **أرسل اسمك الآن للزخرفة، أو اختر من الأزرار:**`;
+            
+            return bot.sendMessage(chatId, welcomeMsg, {
+                parse_mode: 'Markdown',
                 reply_markup: {
+                    // الأزرار التي تظهر تحت الرسالة (Inline)
                     inline_keyboard: [
                         [{ text: '🎬 تيك توك', url: 'https://t.me/SaveAsBot' }, { text: '📺 يوتيوب', url: 'https://t.me/Downloadstorybot' }],
-                        [{ text: '📸 إنستا', url: 'https://t.me/Biobot' }],
+                        [{ text: '📸 إنستقرام', url: 'https://t.me/Biobot' }],
+                        [{ text: '💚 تابعنا على واتساب', url: whatsappChannel }],
                         [{ text: '👨‍💻 المطور يامي', url: devWhatsapp }]
-                    ]
+                    ],
+                    // زر القائمة في مكان الكيبورد (Reply Keyboard)
+                    keyboard: [
+                        [{ text: 'الرجوع للقائمة 🏠' }]
+                    ],
+                    resize_keyboard: true
                 }
             });
         }
 
-        if (!text.startsWith('/') && !text.startsWith('http')) {
+        if (!text.startsWith('/') && !text.startsWith('http') && text !== 'الرجوع للقائمة 🏠') {
             const list = getZakhrafa(text);
             const buttons = [];
             for (let i = 0; i < list.length; i += 2) {
@@ -61,7 +71,7 @@ bot.on('message', async (msg) => {
                 if (list[i+1]) row.push({ text: `فخامة ${i+2} ✨`, callback_data: `zak_${i+1}_${text}` });
                 buttons.push(row);
             }
-            return bot.sendMessage(chatId, `🔥 **زخارف اسم ( ${text} ):**`, { reply_markup: { inline_keyboard: buttons } });
+            return bot.sendMessage(chatId, `🔥 **زخارف اسم ( ${text} ) المختارة:**`, { reply_markup: { inline_keyboard: buttons } });
         }
     } catch (e) { console.log("Error logic"); }
 });
@@ -77,3 +87,4 @@ bot.on('callback_query', (query) => {
         bot.answerCallbackQuery(query.id);
     }
 });
+                 
