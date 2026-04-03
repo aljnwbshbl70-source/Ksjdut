@@ -41,7 +41,7 @@ bot.on('message', async (msg) => {
         }
 
         if (text === '/start') {
-            return bot.sendMessage(chatId, `✨ **مرحباً بك في عالم يامي V7** ✨\n\nأرسل اسمك الآن (بالعربي أو الإنجليزي) وشاهد أقوى الزخارف!`, {
+            return bot.sendMessage(chatId, `✨ **مرحباً بك في عالم جيسيكا  بوت تنزيل يجمع افضل أدوات تنزيل من مواقع التواصل الاجتماعي ويزخرف بافضل تشكيله زخارف في التاريخ V7** ✨\n\nأرسل اسمك الآن (بالعربي أو الإنجليزي) وشاهد أقوى الزخارف!`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: '🎬 تيك توك', url: 'https://t.me/SaveAsBot' }, { text: '📺 يوتيوب', url: 'https://t.me/Downloadstorybot' }],
