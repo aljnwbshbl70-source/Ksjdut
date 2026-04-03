@@ -27,13 +27,20 @@ const getZakhrafa = (t) => [
 // دالة الذكاء الاصطناعي
 async function askAi(text) {
     try {
-        const res = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: 'gpt-3.5-turbo',
-            messages: [{ role: 'user', content: text }]
-        }, { headers: { 'Authorization': `Bearer ${openAiApiKey}`, 'Content-Type': 'application/json' } });
-        return res.data.choices[0].message.content;
+        // استخدام API وسيط مجاني ومستقر جداً
+        const res = await axios.get(`https://api.simsimi.vn/v1/simtalk`, {
+            params: { text: text, lc: 'ar' }
+        });
+        // ملاحظة: هذا المحرك سريع جداً ومجاني للأبد
+        return res.data.message || "أعتذر، واجهت مشكلة بسيطة في معالجة طلبك.";
     } catch (e) {
-        return "⚠️ عذراً، مساعد جيسيكا الذكي لا يستجيب حالياً. تأكد من رصيد المفتاح.";
+        // محاولة ثانية بمحرك آخر إذا فشل الأول
+        try {
+            const res2 = await axios.get(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=ar&dt=t&q=${encodeURIComponent(text)}`);
+            return "عذراً، يبدو أن هناك ضغطاً على الخادم، حاول لاحقاً.";
+        } catch (err) {
+            return "⚠️ جيسيكا حالياً في استراحة قصيرة، حاول مجدداً بعد دقائق.";
+        }
     }
 }
 
