@@ -14,7 +14,7 @@ const channelUsername = '@jes45kabot';
 const whatsappChannel = 'https://whatsapp.com/channel/0029VbC2EnL0AgWBVvM56n1P'; 
 const devWhatsapp = 'https://wa.me/966574360046'; 
 
-// --- مصفوفة الزخارف القوية ---
+// --- مصفوفة الزخارف القوية (40+ شكل) ---
 const getZakhrafa = (t) => [
     `ꪗ̶${t}̶ꪖ̶ꪑ̶ꪱ̶`, `ყ̷${t}̷α̷ɱ̷ι̷`, `Ɏ͢${t}͢₳͢₥͢ł͢`, `𐌖𐌀${t}𐌉`, `𓎛𓄿${t}𓇋`, `ꌩꍏ${t}ꀤ`, `Ⴤმო${t}ɿ`, `ყค${t}ɱɿ`, `ƴค${t}ɱɿ`,
     `${t} ΛMI`, `${t} ΔMI`, `${t} ᗩMI`, `ⲨⲀ${t}Ⲓ`,
@@ -40,9 +40,9 @@ bot.on('message', async (msg) => {
             });
         }
 
-        // --- القائمة الرئيسية ---
-        if (text === '/start' || text === 'الرجوع للقائمة 🏠') {
-            const welcomeMsg = `✨ **مرحباً بك في عالم جيسيكا** ✨\n\n🚀 **بوت التحميل والزخرفة الأقوى:**\n• تنزيل من جميع المواقع.\n• زخرفة احترافية (فقط أرسل اسمك).\n• تغيير صيغ الملفات (حتى 10 ميجا).\n\n👇 **اختر الخدمة المطلوبة:**`;
+        // --- القائمة الرئيسية (أزرار شفافة فقط) ---
+        if (text === '/start') {
+            const welcomeMsg = `✨ **مرحباً بك في عالم جيسيكا** ✨\n\n🚀 **أقوى بوت تحميل وزخرفة:**\n• تنزيل فيديوهات من كل المواقع.\n• زخرفة احترافية (أرسل اسمك فقط).\n• تحويل صيغ الملفات (حتى 10 ميجا).\n\n👇 **اختر من الأزرار بالأسفل:**`;
             
             return bot.sendMessage(chatId, welcomeMsg, {
                 parse_mode: 'Markdown',
@@ -53,16 +53,13 @@ bot.on('message', async (msg) => {
                         [{ text: '🔄 تغيير صيغ الملفات', callback_data: 'convert_info' }],
                         [{ text: '💚 تابعنا على واتساب', url: whatsappChannel }],
                         [{ text: '👨‍💻 المطور يامي', url: devWhatsapp }]
-                    ],
-                    keyboard: [[{ text: 'الرجوع للقائمة 🏠' }]],
-                    resize_keyboard: true,
-                    one_time_keyboard: false
+                    ]
                 }
             });
         }
 
-        // --- نظام الزخرفة الذكي ---
-        if (!text.startsWith('/') && !text.startsWith('http') && text !== 'الرجوع للقائمة 🏠') {
+        // --- نظام الزخرفة ---
+        if (!text.startsWith('/') && !text.startsWith('http')) {
             const list = getZakhrafa(text);
             const buttons = [];
             for (let i = 0; i < list.length; i += 2) {
@@ -74,23 +71,14 @@ bot.on('message', async (msg) => {
             return bot.sendMessage(chatId, `🔥 **زخارف اسم ( ${text} ):**`, { reply_markup: { inline_keyboard: buttons } });
         }
 
-        // --- تنبيه عند إرسال ملف ---
-        if (msg.document) {
-            if (msg.document.file_size > 10 * 1024 * 1024) {
-                return bot.sendMessage(chatId, "⚠️ حجم الملف كبير جداً! الحد الأقصى هو 10 ميجا.");
-            }
-            bot.sendMessage(chatId, "✅ استلمت ملفك. جاري تجهيز خيارات التحويل...");
-        }
-
     } catch (e) { console.log("Error logic"); }
 });
 
-// --- معالجة الضغط على الأزرار ---
 bot.on('callback_query', (query) => {
     const data = query.data;
     
     if (data === 'convert_info') {
-        bot.sendMessage(query.message.chat.id, "📁 **قسم تغيير الصيغ:**\nأرسل الملف الآن (صورة، مستند، صوت) بحد أقصى 10 ميجا وسأقترح عليك الصيغ المناسبة للتحويل.");
+        bot.sendMessage(query.message.chat.id, "📁 **قسم تغيير الصيغ:**\nأرسل ملفك الآن (بحد أقصى 10 ميجا) وسنقوم بمساعدتك في تحويله.");
         bot.answerCallbackQuery(query.id);
     }
 
@@ -103,3 +91,4 @@ bot.on('callback_query', (query) => {
         bot.answerCallbackQuery(query.id);
     }
 });
+        
