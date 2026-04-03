@@ -35,33 +35,33 @@ bot.on('message', async (msg) => {
         const isMember = ['member', 'administrator', 'creator'].includes(member.status);
 
         if (!isMember) {
-            return bot.sendMessage(chatId, `⚠️ **عذراً! يجب عليك الاشتراك في القناة أولاً لاستخدام البوت:**\n\n📢 ${channelUsername}`, {
+            return bot.sendMessage(chatId, `⚠️ **يجب عليك الاشتراك في القناة أولاً:**\n\n📢 ${channelUsername}`, {
                 reply_markup: { inline_keyboard: [[{ text: '📢 إضغط هنا للاشتراك', url: `https://t.me/${channelUsername.replace('@', '')}` }]] }
             });
         }
 
+        // --- القائمة الرئيسية ---
         if (text === '/start' || text === 'الرجوع للقائمة 🏠') {
-            const welcomeMsg = `✨ **مرحباً بك في بوت جيسيكا الشامل V8** ✨\n\n🚀 **أقوى بوت تحميل وزخرفة في التاريخ:**\n• تنزيل من جميع مواقع التواصل الاجتماعي.\n• زخرفة احترافية بأكثر من 40 ستايل عالمي.\n\n👇 **أرسل اسمك الآن للزخرفة، أو اختر من الأزرار:**`;
+            const welcomeMsg = `✨ **مرحباً بك في عالم جيسيكا** ✨\n\n🚀 **بوت التحميل والزخرفة الأقوى:**\n• تنزيل من جميع المواقع.\n• زخرفة احترافية (فقط أرسل اسمك).\n• تغيير صيغ الملفات (حتى 10 ميجا).\n\n👇 **اختر الخدمة المطلوبة:**`;
             
             return bot.sendMessage(chatId, welcomeMsg, {
                 parse_mode: 'Markdown',
                 reply_markup: {
-                    // الأزرار التي تظهر تحت الرسالة (Inline)
                     inline_keyboard: [
                         [{ text: '🎬 تيك توك', url: 'https://t.me/SaveAsBot' }, { text: '📺 يوتيوب', url: 'https://t.me/Downloadstorybot' }],
                         [{ text: '📸 إنستقرام', url: 'https://t.me/Biobot' }],
+                        [{ text: '🔄 تغيير صيغ الملفات', callback_data: 'convert_info' }],
                         [{ text: '💚 تابعنا على واتساب', url: whatsappChannel }],
                         [{ text: '👨‍💻 المطور يامي', url: devWhatsapp }]
                     ],
-                    // زر القائمة في مكان الكيبورد (Reply Keyboard)
-                    keyboard: [
-                        [{ text: 'الرجوع للقائمة 🏠' }]
-                    ],
-                    resize_keyboard: true
+                    keyboard: [[{ text: 'الرجوع للقائمة 🏠' }]],
+                    resize_keyboard: true,
+                    one_time_keyboard: false
                 }
             });
         }
 
+        // --- نظام الزخرفة الذكي ---
         if (!text.startsWith('/') && !text.startsWith('http') && text !== 'الرجوع للقائمة 🏠') {
             const list = getZakhrafa(text);
             const buttons = [];
@@ -71,13 +71,29 @@ bot.on('message', async (msg) => {
                 if (list[i+1]) row.push({ text: `فخامة ${i+2} ✨`, callback_data: `zak_${i+1}_${text}` });
                 buttons.push(row);
             }
-            return bot.sendMessage(chatId, `🔥 **زخارف اسم ( ${text} ) المختارة:**`, { reply_markup: { inline_keyboard: buttons } });
+            return bot.sendMessage(chatId, `🔥 **زخارف اسم ( ${text} ):**`, { reply_markup: { inline_keyboard: buttons } });
         }
+
+        // --- تنبيه عند إرسال ملف ---
+        if (msg.document) {
+            if (msg.document.file_size > 10 * 1024 * 1024) {
+                return bot.sendMessage(chatId, "⚠️ حجم الملف كبير جداً! الحد الأقصى هو 10 ميجا.");
+            }
+            bot.sendMessage(chatId, "✅ استلمت ملفك. جاري تجهيز خيارات التحويل...");
+        }
+
     } catch (e) { console.log("Error logic"); }
 });
 
+// --- معالجة الضغط على الأزرار ---
 bot.on('callback_query', (query) => {
     const data = query.data;
+    
+    if (data === 'convert_info') {
+        bot.sendMessage(query.message.chat.id, "📁 **قسم تغيير الصيغ:**\nأرسل الملف الآن (صورة، مستند، صوت) بحد أقصى 10 ميجا وسأقترح عليك الصيغ المناسبة للتحويل.");
+        bot.answerCallbackQuery(query.id);
+    }
+
     if (data.startsWith('zak_')) {
         const parts = data.split('_');
         const index = parseInt(parts[1]);
@@ -87,4 +103,3 @@ bot.on('callback_query', (query) => {
         bot.answerCallbackQuery(query.id);
     }
 });
-                
