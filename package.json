@@ -1,13 +1,15 @@
 {
-  "name": "yami-downloader-v4",
+  "name": "jessica-bot",
   "version": "1.0.0",
+  "description": "Jessica AI Bot",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-"dependencies": {
-  "node-telegram-bot-api": "^0.61.0",
-  "axios": "^1.6.0",
-  "express": "^4.18.2",
-  "pdfkit": "^0.13.0"
+  "dependencies": {
+    "node-telegram-bot-api": "^0.61.0",
+    "axios": "^1.6.0",
+    "express": "^4.18.2",
+    "pdfkit": "^0.13.0"
+  }
 }
