@@ -10,7 +10,8 @@ app.listen(port, '0.0.0.0');
 
 // --- الإعدادات ---
 const token = '8797569562:AAHpKFwIWDBjudIwwbNZBjapckJnIYGewbY'; 
-const openAiApiKey = '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';
+// تم تحديث المفتاح هنا ليعمل الـ AI فوراً
+const openAiApiKey = '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';
 
 const bot = new TelegramBot(token, { polling: true });
 const userState = {}; 
@@ -32,7 +33,10 @@ async function askAi(text) {
             messages: [{ role: 'user', content: text }]
         }, { headers: { 'Authorization': `Bearer ${openAiApiKey}`, 'Content-Type': 'application/json' } });
         return res.data.choices[0].message.content;
-    } catch (e) { return "⚠️ عذراً، مساعد جيسيكا مشغول حالياً."; }
+    } catch (e) { 
+        console.log("AI Error Details:", e.response ? e.response.data : e.message);
+        return "⚠️ عذراً، مساعد جيسيكا مشغول حالياً. (تأكد من رصيد مفتاح الـ AI في OpenAI)"; 
+    }
 }
 
 bot.on('message', async (msg) => {
@@ -50,7 +54,6 @@ bot.on('message', async (msg) => {
         }
     } catch (e) { console.log("Sub Error"); }
 
-    // القائمة الرئيسية (تم حذف الكيبورد العادي)
     if (text === '/start') {
         userState[chatId] = null;
         const welcomeMsg = `✨ **عالم جيسيكا AI المطور** ✨\n\nأهلاً بك يا ${msg.from.first_name}، اختر خدمتك من الأزرار الشفافة:`;
@@ -84,7 +87,6 @@ bot.on('message', async (msg) => {
                     { text: `فخامة ${i+2} ✨`, callback_data: `sh_${i+1}_${text}` }
                 ]);
             }
-            // إضافة زر للعودة داخل الرسالة نفسها
             buttons.push([{ text: '🏠 الرجوع للقائمة', callback_data: 'back_main' }]);
             return bot.sendMessage(chatId, `🔥 **زخارف لاسم ( ${text} ):**`, { reply_markup: { inline_keyboard: buttons } });
         }
@@ -103,7 +105,7 @@ bot.on('callback_query', (q) => {
 
     if (q.data === 'mode_zak') {
         userState[chatId] = 'ZAK';
-        bot.sendMessage(chatId, "🎨 **قسم الزخرفة الاحترافية:** أرسل الاسم الآن لزخرفته.", {
+        bot.sendMessage(chatId, "🎨 **أنت الآن في قسم الزخرفة.** أرسل الاسم الآن لزخرفته.", {
             reply_markup: { inline_keyboard: [[{ text: '🏠 عودة', callback_data: 'back_main' }]] }
         });
     }
@@ -121,4 +123,4 @@ bot.on('callback_query', (q) => {
 
     bot.answerCallbackQuery(q.id);
 });
-                        
+                           
